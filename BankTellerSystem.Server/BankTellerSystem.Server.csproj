@@ -25,7 +25,6 @@
     <Folder Include="Contracts\" />
     <Folder Include="Services\" />
     <Folder Include="Realtime\" />
-    <Folder Include="Queueing\" />
   </ItemGroup>
 
 </Project>
