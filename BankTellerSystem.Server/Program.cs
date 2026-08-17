@@ -1,4 +1,6 @@
 using BankTellerSystem.Server.Data;
+using BankTellerSystem.Server.Queueing;
+using BankTellerSystem.Server.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,9 +11,16 @@ builder.Services.AddSwaggerGen();
 
 // EF Core + SQLite. We use IDbContextFactory (not AddDbContext) because our
 // services will be registered as singletons and create a short-lived
-// DbContext per operation - the recommended pattern outside per-request scope.
+// DbContext per operation
 var connectionString = builder.Configuration.GetConnectionString("Default") ?? "Data Source=bankteller.db";
 builder.Services.AddDbContextFactory<AppDbContext>(options => options.UseSqlite(connectionString));
+
+// Single shared queue so ticket, transfer, and rate operations are all
+// serialized against each other, not just within their own service.
+builder.Services.AddSingleton<SerialOperationQueue>();
+builder.Services.AddSingleton<TicketQueueService>();
+builder.Services.AddSingleton<AccountTransferService>();
+builder.Services.AddSingleton<ExchangeRateService>();
 
 var app = builder.Build();
 
@@ -33,5 +42,5 @@ app.MapControllers();
 
 app.Run();
 
-// Exposed for WebApplicationFactory in integration tests, if we need it later.
+// Exposed for WebApplicationFactory in integration tests
 public partial class Program { }
