@@ -20,8 +20,4 @@
     <ProjectReference Include="..\BankTellerSystem.Domain\BankTellerSystem.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Realtime\" />
-  </ItemGroup>
-
 </Project>
