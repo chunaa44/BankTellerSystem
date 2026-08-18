@@ -1,6 +1,7 @@
 ﻿using BankTellerSystem.Domain;
 using BankTellerSystem.Server.Data;
 using BankTellerSystem.Server.Queueing;
+using BankTellerSystem.Server.Realtime;
 using BankTellerSystem.Server.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,7 +27,10 @@ public class TicketQueueServiceTests
             db.Database.EnsureCreated(); // applies schema + HasData seed (Counters 1-3)
         }
 
-        _service = new TicketQueueService(new TestDbContextFactory(options), new SerialOperationQueue());
+        _service = new TicketQueueService(
+            new TestDbContextFactory(options),
+            new SerialOperationQueue(),
+            new TicketDisplayTcpConnectionManager());
     }
 
     [TestCleanup]

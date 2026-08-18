@@ -1,6 +1,7 @@
 ﻿using BankTellerSystem.Domain;
 using BankTellerSystem.Server.Data;
 using BankTellerSystem.Server.Queueing;
+using BankTellerSystem.Server.Realtime;
 using Microsoft.EntityFrameworkCore;
 
 namespace BankTellerSystem.Server.Services;
@@ -8,7 +9,10 @@ namespace BankTellerSystem.Server.Services;
 // Handles the three ticket-queue operations a teller/dispenser can trigger.
 // Every DB-touching operation runs through SerialOperationQueue so concurrent
 // requests can never issue duplicate numbers or call the same ticket twice.
-public class TicketQueueService(IDbContextFactory<AppDbContext> dbFactory, SerialOperationQueue queue)
+public class TicketQueueService(
+    IDbContextFactory<AppDbContext> dbFactory,
+    SerialOperationQueue queue,
+    TicketDisplayTcpConnectionManager displayConnections)
 {
     // Dispenser terminal: prints and persists the next ticket number.
     public Task<Ticket> IssueTicketAsync(CancellationToken ct = default)
@@ -31,8 +35,9 @@ public class TicketQueueService(IDbContextFactory<AppDbContext> dbFactory, Seria
 
     // Teller: calls the oldest waiting ticket to their counter.
     // Returns null if there's nothing waiting.
-    public Task<Ticket?> CallNextAsync(int counterId, CancellationToken ct = default)
-        => queue.Enqueue(async () =>
+    public async Task<Ticket?> CallNextAsync(int counterId, CancellationToken ct = default)
+    {
+        var called = await queue.Enqueue(async () =>
         {
             await using var db = await dbFactory.CreateDbContextAsync(ct);
 
@@ -55,6 +60,13 @@ public class TicketQueueService(IDbContextFactory<AppDbContext> dbFactory, Seria
             await db.SaveChangesAsync(ct);
             return next;
         });
+
+        // Tell every connected display screen which number just got called.
+        if (called is not null)
+            await displayConnections.BroadcastAsync($"{called.Number}|{counterId}", ct);
+
+        return called;
+    }
 
     // Teller: marks the counter's current ticket as served and frees the counter.
     public Task<Ticket?> CompleteCurrentAsync(int counterId, CancellationToken ct = default)

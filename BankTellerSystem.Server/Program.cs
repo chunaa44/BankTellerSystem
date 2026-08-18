@@ -1,5 +1,6 @@
 using BankTellerSystem.Server.Data;
 using BankTellerSystem.Server.Queueing;
+using BankTellerSystem.Server.Realtime;
 using BankTellerSystem.Server.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,12 @@ builder.Services.AddSingleton<SerialOperationQueue>();
 builder.Services.AddSingleton<TicketQueueService>();
 builder.Services.AddSingleton<AccountTransferService>();
 builder.Services.AddSingleton<ExchangeRateService>();
+
+// Tracks connected ticket-display screens and lets us broadcast to them.
+builder.Services.AddSingleton<TicketDisplayTcpConnectionManager>();
+
+// Starts the TCP listener as soon as the app starts, stops it on shutdown.
+builder.Services.AddHostedService<TicketDisplayTcpServer>();
 
 var app = builder.Build();
 
