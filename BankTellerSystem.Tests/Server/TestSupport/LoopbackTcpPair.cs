@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 
-namespace BankTellerSystem.Tests.TestSupport;
+namespace BankTellerSystem.Tests.Server.TestSupport;
 
 // A real, connected pair of TcpClients on the loopback adapter: one end
 // plays the role of "the server" (what TicketDisplayTcpConnectionManager

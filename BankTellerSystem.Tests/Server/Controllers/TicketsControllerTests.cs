@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using BankTellerSystem.Server.Contracts;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace BankTellerSystem.Tests.Controllers;
+namespace BankTellerSystem.Tests.Server.Controllers;
 
 [TestClass]
 public class TicketsControllerTests

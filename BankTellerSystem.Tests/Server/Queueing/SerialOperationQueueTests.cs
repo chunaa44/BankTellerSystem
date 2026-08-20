@@ -1,6 +1,6 @@
 ﻿using BankTellerSystem.Server.Queueing;
 
-namespace BankTellerSystem.Tests.Queueing;
+namespace BankTellerSystem.Tests.Server.Queueing;
 
 [TestClass]
 public class SerialOperationQueueTests

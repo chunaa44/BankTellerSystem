@@ -3,7 +3,7 @@ using BankTellerSystem.Server.Queueing;
 using BankTellerSystem.Server.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace BankTellerSystem.Tests.Services;
+namespace BankTellerSystem.Tests.Server.Services;
 
 [TestClass]
 public class ExchangeRateServiceTests

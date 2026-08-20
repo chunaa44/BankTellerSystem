@@ -5,7 +5,7 @@ using BankTellerSystem.Server.Realtime;
 using BankTellerSystem.Server.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace BankTellerSystem.Tests.Services;
+namespace BankTellerSystem.Tests.Server.Services;
 
 [TestClass]
 public class TicketQueueServiceTests

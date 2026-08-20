@@ -4,7 +4,7 @@ using BankTellerSystem.Server.Realtime;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BankTellerSystem.Tests.Realtime;
+namespace BankTellerSystem.Tests.Server.Realtime;
 
 [TestClass]
 public class TicketDisplayTcpServerTests

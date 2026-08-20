@@ -1,8 +1,8 @@
 ﻿using System.Net.Sockets;
 using BankTellerSystem.Server.Realtime;
-using BankTellerSystem.Tests.TestSupport;
+using BankTellerSystem.Tests.Server.TestSupport;
 
-namespace BankTellerSystem.Tests.Realtime;
+namespace BankTellerSystem.Tests.Server.Realtime;
 
 [TestClass]
 public class TicketDisplayTcpConnectionManagerTests
