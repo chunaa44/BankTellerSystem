@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BankTellerSystem.DispenserApp\BankTellerSystem.DispenserApp.csproj" />
     <ProjectReference Include="..\BankTellerSystem.Server\BankTellerSystem.Server.csproj" />
+    <ProjectReference Include="..\BankTellerSystem.TellerApp\BankTellerSystem.TellerApp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
