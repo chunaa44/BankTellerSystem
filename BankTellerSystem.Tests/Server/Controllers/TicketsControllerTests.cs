@@ -22,6 +22,7 @@ public class TicketsControllerTests
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseSetting("ConnectionStrings:Default", $"Data Source={_dbPath}");
+            builder.UseSetting("TicketDisplayTcp:Port", "0"); // let the OS pick a free port
         });
 
         _client = _factory.CreateClient();

@@ -18,6 +18,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BankTellerSystem.DispenserApp\BankTellerSystem.DispenserApp.csproj" />
+	  <ProjectReference Include="..\BankTellerSystem.RateDisplay\BankTellerSystem.RateDisplay.csproj">
+		  <Aliases>RateDisplayAssembly</Aliases>
+	  </ProjectReference>
     <ProjectReference Include="..\BankTellerSystem.Server\BankTellerSystem.Server.csproj" />
     <ProjectReference Include="..\BankTellerSystem.TellerApp\BankTellerSystem.TellerApp.csproj" />
   </ItemGroup>

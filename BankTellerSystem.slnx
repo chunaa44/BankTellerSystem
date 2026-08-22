@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="BankTellerSystem.DispenserApp/BankTellerSystem.DispenserApp.csproj" Id="da89568b-a08b-455e-b1d7-e803be1df4a6" />
   <Project Path="BankTellerSystem.Domain/BankTellerSystem.Domain.csproj" />
+  <Project Path="BankTellerSystem.RateDisplay/BankTellerSystem.RateDisplay.csproj" Id="728897c3-a7af-4f44-986d-27a0cb0a88d0" />
   <Project Path="BankTellerSystem.Server/BankTellerSystem.Server.csproj" />
   <Project Path="BankTellerSystem.TellerApp/BankTellerSystem.TellerApp.csproj" Id="71d22e42-6aae-4216-a297-7bf78575f890" />
   <Project Path="BankTellerSystem.Tests/BankTellerSystem.Tests.csproj" />

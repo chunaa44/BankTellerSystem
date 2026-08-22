@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 // EF Core + SQLite. We use IDbContextFactory (not AddDbContext) because our
 // services will be registered as singletons and create a short-lived
@@ -46,8 +47,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+app.MapHub<ExchangeRateHub>("/hubs/exchange-rates");
 
 app.Run();
 
+
 // Exposed for WebApplicationFactory in integration tests
 public partial class Program { }
+

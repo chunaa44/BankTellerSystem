@@ -1,6 +1,9 @@
-﻿using BankTellerSystem.Domain;
+﻿// BankTellerSystem.Server/Services/ExchangeRateService.cs
+using BankTellerSystem.Domain;
 using BankTellerSystem.Server.Data;
 using BankTellerSystem.Server.Queueing;
+using BankTellerSystem.Server.Realtime;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BankTellerSystem.Server.Services;
@@ -8,10 +11,15 @@ namespace BankTellerSystem.Server.Services;
 // Handles reading and updating currency exchange rates. Updates run through
 // SerialOperationQueue for consistency with the other services and to avoid
 // two simultaneous rate edits interleaving; reads don't need the queue since
-// they don't mutate anything.
-public class ExchangeRateService(IDbContextFactory<AppDbContext> dbFactory, SerialOperationQueue queue)
+// they don't mutate anything. Every successful update is also pushed out over
+// SignalR so the Blazor rate-display screen updates itself in real time.
+public class ExchangeRateService(
+    IDbContextFactory<AppDbContext> dbFactory,
+    SerialOperationQueue queue,
+    IHubContext<ExchangeRateHub> hub)
 {
-    // Currency-rate display screen: fetches all current rates.
+    // Currency-rate display screen: fetches all current rates. Used for the
+    // initial page load only - after that, updates arrive via SignalR.
     public async Task<List<ExchangeRate>> GetAllAsync(CancellationToken ct = default)
     {
         await using var db = await dbFactory.CreateDbContextAsync(ct);
@@ -39,6 +47,16 @@ public class ExchangeRateService(IDbContextFactory<AppDbContext> dbFactory, Seri
             rate.UpdatedAtUtc = DateTime.UtcNow;
 
             await db.SaveChangesAsync(ct);
+
+            // Tell every connected display screen about the new rate.
+            await hub.Clients.All.SendAsync("RateUpdated", new
+            {
+                rate.CurrencyCode,
+                rate.BuyRate,
+                rate.SellRate,
+                rate.UpdatedAtUtc
+            }, ct);
+
             return rate;
         });
 }

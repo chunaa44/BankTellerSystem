@@ -1,0 +1,78 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@implements IAsyncDisposable
+@inject ExchangeRateApiClient ApiClient
+@inject IConfiguration Configuration
+
+<PageTitle>Exchange Rates</PageTitle>
+
+<style>
+    body { font-family: Segoe UI, sans-serif; }
+    h1 { font-size: 2.5rem; }
+    table { border-collapse: collapse; width: 100%; font-size: 2rem; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem 1rem; text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+</style>
+
+<h1>Currency Exchange Rates</h1>
+
+@if (_rates is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr><th>Currency</th><th>Buy</th><th>Sell</th><th>Updated</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var rate in _rates.Values.OrderBy(r => r.CurrencyCode))
+            {
+                <tr>
+                    <td>@rate.CurrencyCode</td>
+                    <td>@rate.BuyRate</td>
+                    <td>@rate.SellRate</td>
+                    <td>@rate.UpdatedAtUtc.ToLocalTime().ToString("T")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    // Keyed by currency code so a SignalR push can replace just one row.
+    private Dictionary<string, ExchangeRateDto>? _rates;
+    private HubConnection? _hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. Initial snapshot via the same REST endpoint the teller app uses.
+        var initial = await ApiClient.GetAllAsync();
+        _rates = initial.ToDictionary(r => r.CurrencyCode);
+
+        // 2. From here on, stay live via SignalR - the
+        // hub pushes a "RateUpdated" message every time a teller saves a rate.
+        var serverBaseUrl = Configuration["ServerBaseUrl"]
+            ?? throw new InvalidOperationException("ServerBaseUrl missing from appsettings.json.");
+
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(new Uri(new Uri(serverBaseUrl), "hubs/exchange-rates"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        _hubConnection.On<ExchangeRateDto>("RateUpdated", updated =>
+        {
+            _rates[updated.CurrencyCode] = updated;
+            InvokeAsync(StateHasChanged); // we're on a SignalR thread, not Blazor's
+        });
+
+        await _hubConnection.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+            await _hubConnection.DisposeAsync();
+    }
+}
